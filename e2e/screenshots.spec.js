@@ -9,11 +9,17 @@ import { test, expect } from '@playwright/test'
  *
  * To update baselines: npx playwright test --update-snapshots
  */
+/**
+ * Block external font CDN to prevent rendering-blocking hangs in restricted environments.
+ */
+test.beforeEach(async ({ page }) => {
+  await page.route('**/*.googleapis.com/**', route => route.abort())
+  await page.route('**/*.gstatic.com/**', route => route.abort())
+})
+
 test.describe('Visual regression', () => {
   test('title screen', async ({ page }) => {
     await page.goto('/')
-    // Wait for web font to load
-    await page.waitForFunction(() => document.fonts.ready)
     await page.waitForTimeout(500)
     await expect(page).toHaveScreenshot('title-screen.png', {
       fullPage: true,

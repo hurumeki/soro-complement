@@ -56,7 +56,7 @@ export default defineConfig({
 
   /* Build and serve static files before tests */
   webServer: {
-    command: 'npm run build && npx serve dist -l 4173 -s',
+    command: 'npm run build && npx serve dist -l 4173 -s --cors',
     port: 4173,
     reuseExistingServer: !process.env.CI,
     timeout: 30000,

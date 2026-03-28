@@ -1,6 +1,15 @@
 // @ts-check
 import { test, expect } from '@playwright/test'
 
+/**
+ * Block external font CDN requests to prevent test hangs in restricted network environments.
+ * Google Fonts CSS blocks rendering and prevents module scripts from executing.
+ */
+test.beforeEach(async ({ page }) => {
+  await page.route('**/*.googleapis.com/**', route => route.abort())
+  await page.route('**/*.gstatic.com/**', route => route.abort())
+})
+
 test.describe('Screen navigation', () => {
   test('title screen displays correctly', async ({ page }) => {
     await page.goto('/')
