@@ -24,6 +24,14 @@ soro-complement/
 │       ├── problem.js        ← Problem generation & addition logic
 │       ├── audio.js          ← Web Audio API sound manager
 │       └── storage.js        ← Local storage manager
+├── e2e/
+│   ├── README.md             ← E2E test documentation
+│   ├── screens.spec.js       ← Screen navigation & functional tests
+│   └── screenshots.spec.js   ← Visual regression tests
+├── playwright.config.js      ← Playwright configuration
+├── .github/
+│   └── workflows/
+│       └── e2e.yml           ← CI workflow for E2E tests
 └── CLAUDE.md                 ← AI assistant instructions
 ```
 
@@ -32,3 +40,10 @@ soro-complement/
 - **Dev server:** `npm run dev` (Vite dev server with HMR)
 - **Build:** `npm run build` (outputs to `dist/`)
 - **Preview:** `npm run preview` (serve built files locally)
+
+## E2E Testing
+
+- **Run tests:** `npm run test:e2e`
+- **Update screenshots:** `npm run test:e2e:update`
+- **UI mode:** `npm run test:e2e:ui`
+- See `e2e/README.md` for details
