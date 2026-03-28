@@ -3,7 +3,7 @@
 **Project Name:** Soroban Challenge
 **Target Environment:** Smartphone / Tablet browser (offline capable)
 **Target Users:** Elementary school students
-**Tech Stack:** HTML / CSS / JavaScript (single file)
+**Tech Stack:** HTML / CSS / JavaScript (Vite build)
 
 ---
 
