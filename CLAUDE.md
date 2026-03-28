@@ -4,7 +4,16 @@
 
 作業を開始する前に、以下の環境変数が設定されていることを確認してください。
 
-- `GITHUB_TOKEN`: GitHub API へのアクセスに必要です。設定されていない場合は、作業を中断してユーザーに通知してください。
+- `GITHUB_TOKEN`: GitHub API へのアクセスおよび git push に必要です。設定されていない場合は、作業を中断してユーザーに通知してください。
+
+## Git push の方法
+
+デフォルトの remote URL では push に失敗する場合があります。その場合は `GITHUB_TOKEN` を使って remote URL を設定してから push してください。
+
+```bash
+git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/hurumeki/soro-complement.git"
+git push -u origin <branch-name>
+```
 
 ## 仕様書
 
