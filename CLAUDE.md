@@ -32,6 +32,15 @@ git push -u origin <branch-name>
 - 実装の過程で仕様に変更が生じた場合は、該当する `docs/spec/` 内のファイルを最新の状態に更新してください。
 - 仕様書とコードの整合性を常に保つようにしてください。
 
+## Playwright テストの実行
+
+`npx playwright install` はこの環境では失敗するため、実行しないでください。
+システムにインストール済みの Chromium を使うために、環境変数を設定してテストを実行してください。
+
+```bash
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/root/.cache/ms-playwright/chromium-1194/chrome-linux/chrome npx playwright test
+```
+
 ## 作業中のルール
 
 - 指示された方法やプランの手順が失敗した場合、自己判断で別の方法に切り替えず、必ずユーザーに確認を取ってから次の方法を試してください。

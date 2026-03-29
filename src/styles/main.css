@@ -1,6 +1,6 @@
 /* ===== Reset & Base ===== */
 :root {
-  --bead-h: clamp(26px, 8vw, 38px);
+  --bead-h: clamp(36px, 11.2vw, 53px);
 }
 
 *,
@@ -226,19 +226,8 @@ body {
 }
 
 .rod {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
   position: relative;
-}
-
-.abacus-upper .rod {
-  justify-content: flex-start;
-}
-
-.abacus-lower .rod {
-  justify-content: flex-end;
+  flex: 1;
 }
 
 .rod::before {
@@ -246,6 +235,8 @@ body {
   position: absolute;
   top: -4px;
   bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 3px;
   background: linear-gradient(180deg, #a08860, #8b7355);
   border-radius: 1px;
@@ -258,11 +249,12 @@ body {
   background: linear-gradient(180deg, #faf0d8 0%, #ede0c0 30%, #d4bc88 70%, #c8b080 100%);
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
-  position: relative;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1;
   cursor: pointer;
-  transition: transform 0.06s ease-out;
-  flex-shrink: 0;
+  transition: top 0.06s ease-out;
 }
 
 .bead.active {
