@@ -1,4 +1,8 @@
 /* ===== Reset & Base ===== */
+:root {
+  --bead-h: clamp(26px, 8vw, 38px);
+}
+
 *,
 *::before,
 *::after {
@@ -171,7 +175,6 @@ body {
 
 /* Abacus area */
 .abacus-area {
-  flex: 1;
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
@@ -182,7 +185,6 @@ body {
 }
 
 .abacus-frame {
-  flex: 1;
   background: linear-gradient(160deg, #7a5030, #8b5e34 40%, #6b4420);
   border-radius: 14px;
   border: 4px solid #3a2210;
@@ -195,7 +197,7 @@ body {
 }
 
 .abacus-upper {
-  flex: 2;
+  height: calc(var(--bead-h) * 2);
   display: flex;
   justify-content: space-around;
   align-items: stretch;
@@ -212,7 +214,7 @@ body {
 }
 
 .abacus-lower {
-  flex: 5;
+  height: calc(var(--bead-h) * 5);
   display: flex;
   justify-content: space-around;
   align-items: stretch;
@@ -249,7 +251,7 @@ body {
 
 .bead {
   width: clamp(52px, 20vw, 80px);
-  height: clamp(26px, 8vw, 38px);
+  height: var(--bead-h);
   background: linear-gradient(180deg, #faf0d8 0%, #ede0c0 30%, #d4bc88 70%, #c8b080 100%);
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
