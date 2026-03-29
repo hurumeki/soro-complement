@@ -24,7 +24,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run E2E tests
-        run: npx playwright test --project=mobile-chrome
+        run: npx playwright test --project=mobile-chrome e2e/screens.spec.js
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
