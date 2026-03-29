@@ -47,10 +47,10 @@ export function createAbacus(numDigits, onChange) {
       const beadTop = rods[r].upper === 0 ? 0 : beadH
       const beadMid = beadTop + beadH / 2
 
-      if (y > beadMid) {
-        rods[r].upper = 1 // push to beam
+      if (y < beadMid) {
+        rods[r].upper = 1 // tapped above bead (frame–bead gap) → push to beam
       } else {
-        rods[r].upper = 0 // move away from beam
+        rods[r].upper = 0 // tapped below bead (bead–beam gap) → move to frame
       }
       updateRod(r)
       onChange(getValue())
