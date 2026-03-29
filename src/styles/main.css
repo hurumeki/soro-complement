@@ -148,8 +148,11 @@ body {
 
 /* Problem area */
 .problem-area {
+  flex: 1;
   width: 100%;
-  padding: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
@@ -160,9 +163,9 @@ body {
 }
 
 .problem-digit {
-  font-size: clamp(2rem, 10vw, 3.5rem);
+  font-size: clamp(3rem, 14vw, 5rem);
   font-weight: 900;
-  width: 2em;
+  width: 1.5em;
   text-align: center;
   color: #ffffff;
   text-shadow: 0 0 12px rgba(245, 208, 120, 0.4);
