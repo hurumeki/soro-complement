@@ -38,7 +38,8 @@ test.describe('Visual regression', () => {
     })
   })
 
-  test('result screen', async ({ page }) => {
+  // Skipped: auto-transition to result screen was removed (game flow not yet implemented)
+  test.skip('result screen', async ({ page }) => {
     await page.goto('/')
     await page.click('[data-difficulty="normal"]')
     await expect(page.locator('.result-screen')).toBeVisible({ timeout: 10000 })

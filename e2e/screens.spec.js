@@ -41,16 +41,16 @@ test.describe('Screen navigation', () => {
     await expect(upperRods).toHaveCount(2)
   })
 
-  test('game screen → result screen transition', async ({ page }) => {
+  // Skipped: auto-transition to result screen was removed (game flow not yet implemented)
+  test.skip('game screen → result screen transition', async ({ page }) => {
     await page.goto('/')
     await page.click('[data-difficulty="normal"]')
 
-    // Wait for auto-transition to result (mock: 6 seconds)
     await expect(page.locator('.result-screen')).toBeVisible({ timeout: 10000 })
     await expect(page.locator('.result-screen h2')).toHaveText('タイムアップ！')
   })
 
-  test('result screen → title screen via button', async ({ page }) => {
+  test.skip('result screen → title screen via button', async ({ page }) => {
     await page.goto('/')
     await page.click('[data-difficulty="normal"]')
     await expect(page.locator('.result-screen')).toBeVisible({ timeout: 10000 })
@@ -59,7 +59,7 @@ test.describe('Screen navigation', () => {
     await expect(page.locator('.title-screen')).toBeVisible()
   })
 
-  test('result screen → retry game via button', async ({ page }) => {
+  test.skip('result screen → retry game via button', async ({ page }) => {
     await page.goto('/')
     await page.click('[data-difficulty="normal"]')
     await expect(page.locator('.result-screen')).toBeVisible({ timeout: 10000 })
