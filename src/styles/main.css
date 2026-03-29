@@ -1,6 +1,6 @@
 /* ===== Reset & Base ===== */
 :root {
-  --bead-h: clamp(26px, 8vw, 38px);
+  --bead-h: clamp(36px, 11.2vw, 53px);
 }
 
 *,
