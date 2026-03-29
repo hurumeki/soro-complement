@@ -195,11 +195,11 @@ body {
 }
 
 .abacus-upper {
-  flex: 0 0 auto;
+  flex: 2;
   display: flex;
   justify-content: space-around;
-  align-items: center;
-  padding: 1rem 2rem;
+  align-items: stretch;
+  padding: 0 2rem;
   position: relative;
 }
 
@@ -212,11 +212,11 @@ body {
 }
 
 .abacus-lower {
-  flex: 1;
+  flex: 5;
   display: flex;
   justify-content: space-around;
   align-items: stretch;
-  padding: 0.5rem 2rem;
+  padding: 0 2rem;
   position: relative;
 }
 
@@ -224,9 +224,16 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-evenly;
   gap: 0;
   position: relative;
+}
+
+.abacus-upper .rod {
+  justify-content: flex-start;
+}
+
+.abacus-lower .rod {
+  justify-content: flex-end;
 }
 
 .rod::before {
@@ -244,25 +251,20 @@ body {
   width: clamp(52px, 20vw, 80px);
   height: clamp(26px, 8vw, 38px);
   background: linear-gradient(180deg, #faf0d8 0%, #ede0c0 30%, #d4bc88 70%, #c8b080 100%);
-  border-radius: 50%;
-  border: 1.5px solid #b8a070;
-  box-shadow:
-    0 3px 6px rgba(0, 0, 0, 0.25),
-    inset 0 2px 3px rgba(255, 255, 255, 0.6),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
   position: relative;
   z-index: 1;
   cursor: pointer;
   transition: transform 0.06s ease-out;
+  flex-shrink: 0;
 }
 
 .bead.active {
   background: linear-gradient(180deg, #fff3c4 0%, #f5d078 40%, #e0b848 80%, #d4a830 100%);
-  border-color: #c8a030;
-  box-shadow:
-    0 0 12px rgba(245, 208, 120, 0.7),
-    0 3px 6px rgba(0, 0, 0, 0.25),
-    inset 0 2px 3px rgba(255, 255, 255, 0.5);
+  filter:
+    drop-shadow(0 0 8px rgba(245, 208, 120, 0.7))
+    drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
 }
 
 /* Footer */
