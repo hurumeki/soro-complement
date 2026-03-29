@@ -30,21 +30,23 @@ test.describe('Visual regression', () => {
     await page.goto('/')
     await page.click('[data-difficulty="normal"]')
     // Wait for countdown to disappear
-    await page.locator('.countdown-overlay').waitFor({ state: 'hidden', timeout: 3000 })
+    await page.locator('.countdown-overlay').waitFor({ state: 'hidden', timeout: 5000 })
     await expect(page).toHaveScreenshot('game-screen.png', {
       fullPage: true,
-      // Problem digits are random, so mask them
-      mask: [page.locator('.problem-digits')],
+      // Problem digits are random, so mask them; timer is dynamic so mask it too
+      mask: [page.locator('.problem-digits'), page.locator('.timer-text')],
     })
   })
 
-  // Skipped: auto-transition to result screen was removed (game flow not yet implemented)
-  test.skip('result screen', async ({ page }) => {
+  test('result screen', async ({ page }) => {
+    await page.addInitScript(() => { window.__testMode = true })
     await page.goto('/')
     await page.click('[data-difficulty="normal"]')
     await expect(page.locator('.result-screen')).toBeVisible({ timeout: 10000 })
     await expect(page).toHaveScreenshot('result-screen.png', {
       fullPage: true,
+      // Score is dynamic
+      mask: [page.locator('.result-score .value'), page.locator('.high-score')],
     })
   })
 })

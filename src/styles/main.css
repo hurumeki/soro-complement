@@ -100,6 +100,13 @@ body {
 /* ===== Game Screen ===== */
 .game-screen {
   background: #0f1a2e;
+  position: relative;
+}
+
+.game-screen.game-over {
+  pointer-events: none;
+  opacity: 0.6;
+  transition: opacity 0.5s;
 }
 
 .game-header {
@@ -122,7 +129,7 @@ body {
 
 .timer-bar-fill {
   height: 100%;
-  width: 70%;
+  width: 100%;
   background: linear-gradient(90deg, #4caf50, #8bc34a);
   border-radius: 4px;
   transition: width 0.3s;
@@ -130,6 +137,12 @@ body {
 
 .timer-bar-fill.warning {
   background: linear-gradient(90deg, #f44336, #ff9800);
+  animation: timerFlash 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes timerFlash {
+  from { opacity: 1; }
+  to { opacity: 0.5; }
 }
 
 .timer-text {
@@ -148,12 +161,13 @@ body {
 
 /* Problem area */
 .problem-area {
-  flex: 1;
+  flex-shrink: 0;
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
+  padding: 0.5rem 0;
 }
 
 .problem-digits {
@@ -169,11 +183,49 @@ body {
   text-align: center;
   color: #ffffff;
   text-shadow: 0 0 12px rgba(245, 208, 120, 0.4);
+  transition: color 0.3s, text-shadow 0.3s;
 }
 
 .problem-digit.locked {
   color: #5a6a7a;
   text-shadow: none;
+}
+
+.problem-digit.carry-flash {
+  animation: carryBounce 0.4s ease-out;
+}
+
+@keyframes carryBounce {
+  0% { transform: translateY(0); color: #ffffff; }
+  30% { transform: translateY(-12px); color: #f5d078; text-shadow: 0 0 20px rgba(245, 208, 120, 0.8); }
+  100% { transform: translateY(0); }
+}
+
+/* Practice hints */
+.practice-hints {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-top: 0.2rem;
+}
+
+.hint {
+  width: 1.5em;
+  text-align: center;
+  font-size: clamp(1.2rem, 5vw, 1.8rem);
+  font-weight: 700;
+}
+
+.hint-low {
+  color: #42a5f5;
+}
+
+.hint-ok {
+  color: #66bb6a;
+}
+
+.hint-high {
+  color: #ef5350;
 }
 
 /* Abacus area */
@@ -243,6 +295,16 @@ body {
   z-index: 0;
 }
 
+/* Rod locked state */
+.rod.rod-locked {
+  pointer-events: none;
+}
+
+.rod.rod-locked .bead {
+  opacity: 0.4;
+  filter: grayscale(0.8) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+}
+
 .bead {
   width: clamp(52px, 20vw, 80px);
   height: var(--bead-h);
@@ -295,6 +357,44 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* ===== Clear effect overlay ===== */
+.clear-effect {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 50;
+  animation: clearFade 0.8s ease-out forwards;
+}
+
+.clear-text {
+  font-size: clamp(3rem, 15vw, 6rem);
+  font-weight: 900;
+  color: #66bb6a;
+  text-shadow: 0 0 30px rgba(102, 187, 106, 0.8);
+  animation: clearPop 0.4s ease-out;
+}
+
+.combo-text {
+  color: #f5d078;
+  text-shadow: 0 0 30px rgba(245, 208, 120, 0.8);
+  font-size: clamp(2.5rem, 12vw, 5rem);
+}
+
+@keyframes clearPop {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes clearFade {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ===== Result Screen ===== */
 .result-screen {
   justify-content: center;
@@ -330,6 +430,15 @@ body {
   font-size: 0.9rem;
   color: #f5d078;
   margin-top: 0.5rem;
+}
+
+.result-score .high-score.new-record {
+  animation: sparkle 1s ease-in-out infinite alternate;
+}
+
+@keyframes sparkle {
+  from { text-shadow: 0 0 8px rgba(245, 208, 120, 0.5); }
+  to { text-shadow: 0 0 20px rgba(245, 208, 120, 1); }
 }
 
 .result-actions {
