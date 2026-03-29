@@ -1,3 +1,5 @@
+import { createAbacus } from '../game/abacus.js'
+
 const DIGIT_COUNT = {
   practice: 2,
   easy: 2,
@@ -36,32 +38,7 @@ export function renderGame(container, { navigate, difficulty }) {
     </div>
 
     <!-- Abacus -->
-    <div class="abacus-area">
-      <div class="abacus-frame">
-        <!-- Upper beads (heaven beads) -->
-        <div class="abacus-upper">
-          ${Array.from({ length: numDigits }, (_, i) => `
-            <div class="rod">
-              <div class="bead${i === 1 ? ' active' : ''}"></div>
-            </div>
-          `).join('')}
-        </div>
-
-        <!-- Beam -->
-        <div class="abacus-beam"></div>
-
-        <!-- Lower beads (earth beads) -->
-        <div class="abacus-lower">
-          ${Array.from({ length: numDigits }, (_, rodIdx) => `
-            <div class="rod">
-              ${Array.from({ length: 4 }, (_, beadIdx) => `
-                <div class="bead${(rodIdx === 1 && beadIdx < 2) ? ' active' : ''}"></div>
-              `).join('')}
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    </div>
+    <div class="abacus-area"></div>
 
     <!-- Footer: current value + clear button -->
     <div class="game-footer">
@@ -77,14 +54,23 @@ export function renderGame(container, { navigate, difficulty }) {
 
   container.appendChild(screen)
 
-  // Mock: dismiss countdown after 1s, then simulate game end after 3s
+  // Create interactive abacus
+  const valueDisplay = screen.querySelector('.current-value')
+
+  const abacus = createAbacus(numDigits, (value) => {
+    valueDisplay.textContent = '現在: ' + String(value).padStart(numDigits, '0')
+  })
+
+  screen.querySelector('.abacus-area').appendChild(abacus.element)
+
+  // Clear button
+  screen.querySelector('.clear-btn').addEventListener('click', () => {
+    abacus.reset()
+  })
+
+  // Dismiss countdown after 1.5s
   const overlay = screen.querySelector('#countdown-overlay')
   setTimeout(() => {
     overlay.remove()
   }, 1500)
-
-  // Mock: navigate to result after a short demo period
-  setTimeout(() => {
-    navigate('result', { score: 120, difficulty })
-  }, 6000)
 }
