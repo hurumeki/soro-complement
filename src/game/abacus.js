@@ -9,6 +9,28 @@
  * @param {(value: number) => void} onChange - Called when abacus value changes
  * @returns {{ element: HTMLElement, getValue: () => number, getRodValues: () => number[], getRodValue: (i: number) => number, reset: () => void, lockRod: (i: number) => void, unlockAllRods: () => void, isRodLocked: (i: number) => boolean }}
  */
+function addFlickListener(beadEl, { onFlickUp, onFlickDown }) {
+  let startY = 0
+  let startX = 0
+
+  beadEl.addEventListener('touchstart', (e) => {
+    const t = e.touches[0]
+    startY = t.clientY
+    startX = t.clientX
+  }, { passive: true })
+
+  beadEl.addEventListener('touchend', (e) => {
+    const t = e.changedTouches[0]
+    const dy = t.clientY - startY
+    const dx = t.clientX - startX
+    if (Math.abs(dy) > 15 && Math.abs(dy) > Math.abs(dx)) {
+      e.preventDefault() // フリック確定 → click 抑制
+      if (dy < 0) onFlickUp()
+      else onFlickDown()
+    }
+  })
+}
+
 export function createAbacus(numDigits, onChange) {
   const rods = Array.from({ length: numDigits }, () => ({
     upper: 0, // 0 = away from beam, 1 = pushed to beam
@@ -58,6 +80,12 @@ export function createAbacus(numDigits, onChange) {
       onChange(getValue())
     })
 
+    // Flick on upper bead
+    addFlickListener(upperBead, {
+      onFlickUp: () => { if (!locked[r]) { rods[r].upper = 0; updateRod(r); onChange(getValue()) } },
+      onFlickDown: () => { if (!locked[r]) { rods[r].upper = 1; updateRod(r); onChange(getValue()) } },
+    })
+
     upperSection.appendChild(upperRod)
 
     // --- Lower rod (4 earth beads) ---
@@ -70,6 +98,23 @@ export function createAbacus(numDigits, onChange) {
       bead.className = 'bead'
       lowerRod.appendChild(bead)
       lowerBeads.push(bead)
+
+      // Flick on each lower bead
+      const beadIndex = b
+      addFlickListener(bead, {
+        onFlickUp: () => {
+          if (!locked[r]) {
+            rods[r].lower = Math.max(rods[r].lower, beadIndex + 1)
+            updateRod(r); onChange(getValue())
+          }
+        },
+        onFlickDown: () => {
+          if (!locked[r]) {
+            rods[r].lower = Math.min(rods[r].lower, beadIndex)
+            updateRod(r); onChange(getValue())
+          }
+        },
+      })
     }
 
     lowerRod.addEventListener('click', (e) => {
