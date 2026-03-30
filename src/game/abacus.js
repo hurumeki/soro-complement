@@ -7,13 +7,37 @@
  * Create an interactive abacus component.
  * @param {number} numDigits - Number of rods (digits)
  * @param {(value: number) => void} onChange - Called when abacus value changes
- * @returns {{ element: HTMLElement, getValue: () => number, reset: () => void }}
+ * @returns {{ element: HTMLElement, getValue: () => number, getRodValues: () => number[], getRodValue: (i: number) => number, reset: () => void, lockRod: (i: number) => void, unlockAllRods: () => void, isRodLocked: (i: number) => boolean }}
  */
+function addFlickListener(beadEl, { onFlickUp, onFlickDown }) {
+  let startY = 0
+  let startX = 0
+
+  beadEl.addEventListener('touchstart', (e) => {
+    const t = e.touches[0]
+    startY = t.clientY
+    startX = t.clientX
+  }, { passive: true })
+
+  beadEl.addEventListener('touchend', (e) => {
+    const t = e.changedTouches[0]
+    const dy = t.clientY - startY
+    const dx = t.clientX - startX
+    if (Math.abs(dy) > 15 && Math.abs(dy) > Math.abs(dx)) {
+      e.preventDefault() // フリック確定 → click 抑制
+      if (dy < 0) onFlickUp()
+      else onFlickDown()
+    }
+  })
+}
+
 export function createAbacus(numDigits, onChange) {
   const rods = Array.from({ length: numDigits }, () => ({
     upper: 0, // 0 = away from beam, 1 = pushed to beam
     lower: 0, // 0-4 beads pushed to beam
   }))
+
+  const locked = new Array(numDigits).fill(false)
 
   const element = document.createElement('div')
   element.className = 'abacus-frame'
@@ -39,21 +63,27 @@ export function createAbacus(numDigits, onChange) {
     upperRod.appendChild(upperBead)
 
     upperRod.addEventListener('click', (e) => {
+      if (locked[r]) return
       const rect = upperRod.getBoundingClientRect()
       const y = e.clientY - rect.top
-      const beadH = rect.height / 2 // upper area = 2 * bead_h
+      const beadH = rect.height / 2
 
-      // Bead top: inactive=0, active=beadH
       const beadTop = rods[r].upper === 0 ? 0 : beadH
       const beadMid = beadTop + beadH / 2
 
       if (y < beadMid) {
-        rods[r].upper = 1 // tapped above bead (frame–bead gap) → push to beam
+        rods[r].upper = 1
       } else {
-        rods[r].upper = 0 // tapped below bead (bead–beam gap) → move to frame
+        rods[r].upper = 0
       }
       updateRod(r)
       onChange(getValue())
+    })
+
+    // Flick on upper bead
+    addFlickListener(upperBead, {
+      onFlickUp: () => { if (!locked[r]) { rods[r].upper = 0; updateRod(r); onChange(getValue()) } },
+      onFlickDown: () => { if (!locked[r]) { rods[r].upper = 1; updateRod(r); onChange(getValue()) } },
     })
 
     upperSection.appendChild(upperRod)
@@ -68,25 +98,40 @@ export function createAbacus(numDigits, onChange) {
       bead.className = 'bead'
       lowerRod.appendChild(bead)
       lowerBeads.push(bead)
+
+      // Flick on each lower bead
+      const beadIndex = b
+      addFlickListener(bead, {
+        onFlickUp: () => {
+          if (!locked[r]) {
+            rods[r].lower = Math.max(rods[r].lower, beadIndex + 1)
+            updateRod(r); onChange(getValue())
+          }
+        },
+        onFlickDown: () => {
+          if (!locked[r]) {
+            rods[r].lower = Math.min(rods[r].lower, beadIndex)
+            updateRod(r); onChange(getValue())
+          }
+        },
+      })
     }
 
     lowerRod.addEventListener('click', (e) => {
+      if (locked[r]) return
       const rect = lowerRod.getBoundingClientRect()
       const y = e.clientY - rect.top
-      const beadH = rect.height / 5 // lower area = 5 * bead_h
+      const beadH = rect.height / 5
 
       const N = rods[r].lower
 
-      // Compute midpoints of each bead based on current positions
-      // Bead j position: if j < N → top = j * beadH, else → top = (j+1) * beadH
       const midpoints = []
       for (let b = 0; b < 4; b++) {
         const top = b < N ? b * beadH : (b + 1) * beadH
         midpoints.push(top + beadH / 2)
       }
 
-      // Find which gap was tapped
-      let newN = 4 // below all beads → all pushed to beam
+      let newN = 4
       for (let i = 0; i < 4; i++) {
         if (y < midpoints[i]) {
           newN = i
@@ -101,7 +146,7 @@ export function createAbacus(numDigits, onChange) {
 
     lowerSection.appendChild(lowerRod)
 
-    rodElements.push({ upperBead, lowerBeads })
+    rodElements.push({ upperRod, upperBead, lowerRod, lowerBeads })
   }
 
   element.appendChild(upperSection)
@@ -110,36 +155,60 @@ export function createAbacus(numDigits, onChange) {
 
   function updateRod(r) {
     const { upper, lower } = rods[r]
-    const { upperBead, lowerBeads } = rodElements[r]
+    const { upperBead, lowerBeads, upperRod, lowerRod } = rodElements[r]
 
-    // Upper bead: inactive → top:0%, active → top:50%
     upperBead.style.top = upper ? '50%' : '0'
     upperBead.classList.toggle('active', upper === 1)
 
-    // Lower beads: active beads stack from top, inactive from bottom
-    // Bead j: if j < lower → top = j*20%, else → top = (j+1)*20%
     for (let b = 0; b < 4; b++) {
       const bead = lowerBeads[b]
       const pct = b < lower ? b * 20 : (b + 1) * 20
       bead.style.top = pct + '%'
       bead.classList.toggle('active', b < lower)
     }
+
+    // Visual lock state
+    const isLocked = locked[r]
+    upperRod.classList.toggle('rod-locked', isLocked)
+    lowerRod.classList.toggle('rod-locked', isLocked)
+  }
+
+  function getRodValue(r) {
+    return rods[r].upper * 5 + rods[r].lower
   }
 
   function getValue() {
     let total = 0
     for (let r = 0; r < numDigits; r++) {
-      const rodValue = rods[r].upper * 5 + rods[r].lower
-      const placeValue = Math.pow(10, numDigits - 1 - r)
-      total += rodValue * placeValue
+      total += getRodValue(r) * Math.pow(10, numDigits - 1 - r)
     }
     return total
+  }
+
+  function getRodValues() {
+    return Array.from({ length: numDigits }, (_, r) => getRodValue(r))
+  }
+
+  function lockRod(index) {
+    locked[index] = true
+    updateRod(index)
+  }
+
+  function unlockAllRods() {
+    for (let r = 0; r < numDigits; r++) {
+      locked[r] = false
+    }
+  }
+
+  function isRodLocked(index) {
+    return locked[index]
   }
 
   function reset() {
     for (let r = 0; r < numDigits; r++) {
       rods[r].upper = 0
       rods[r].lower = 0
+      locked[r] = false
       updateRod(r)
     }
     onChange(getValue())
@@ -150,5 +219,5 @@ export function createAbacus(numDigits, onChange) {
     updateRod(r)
   }
 
-  return { element, getValue, reset }
+  return { element, getValue, getRodValue, getRodValues, reset, lockRod, unlockAllRods, isRodLocked }
 }

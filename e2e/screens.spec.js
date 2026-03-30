@@ -10,6 +10,13 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/*.gstatic.com/**', route => route.abort())
 })
 
+/** Navigate to game screen with test mode enabled (short timer + fast countdown) */
+async function startGameInTestMode(page, difficulty = 'normal') {
+  await page.addInitScript(() => { window.__testMode = true })
+  await page.goto('/')
+  await page.click(`[data-difficulty="${difficulty}"]`)
+}
+
 test.describe('Screen navigation', () => {
   test('title screen displays correctly', async ({ page }) => {
     await page.goto('/')
@@ -36,32 +43,29 @@ test.describe('Screen navigation', () => {
 
     // easy = 2 digits
     await page.click('[data-difficulty="easy"]')
-    await page.locator('.countdown-overlay').waitFor({ state: 'hidden', timeout: 3000 })
+    await page.locator('.countdown-overlay').waitFor({ state: 'hidden', timeout: 5000 })
     const upperRods = page.locator('.abacus-upper .rod')
     await expect(upperRods).toHaveCount(2)
   })
 
-  // Skipped: auto-transition to result screen was removed (game flow not yet implemented)
-  test.skip('game screen → result screen transition', async ({ page }) => {
-    await page.goto('/')
-    await page.click('[data-difficulty="normal"]')
+  test('game screen → result screen transition', async ({ page }) => {
+    await startGameInTestMode(page, 'normal')
 
+    // testMode: 200ms countdown (3×200ms) + 3s game + 1.5s delay ≈ 5.1s
     await expect(page.locator('.result-screen')).toBeVisible({ timeout: 10000 })
     await expect(page.locator('.result-screen h2')).toHaveText('タイムアップ！')
   })
 
-  test.skip('result screen → title screen via button', async ({ page }) => {
-    await page.goto('/')
-    await page.click('[data-difficulty="normal"]')
+  test('result screen → title screen via button', async ({ page }) => {
+    await startGameInTestMode(page, 'normal')
     await expect(page.locator('.result-screen')).toBeVisible({ timeout: 10000 })
 
     await page.click('#title-btn')
     await expect(page.locator('.title-screen')).toBeVisible()
   })
 
-  test.skip('result screen → retry game via button', async ({ page }) => {
-    await page.goto('/')
-    await page.click('[data-difficulty="normal"]')
+  test('result screen → retry game via button', async ({ page }) => {
+    await startGameInTestMode(page, 'normal')
     await expect(page.locator('.result-screen')).toBeVisible({ timeout: 10000 })
 
     await page.click('#retry-btn')

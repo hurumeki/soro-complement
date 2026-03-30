@@ -1,4 +1,10 @@
+import { getHighScore, setHighScore } from '../game/storage.js'
+
 export function renderResult(container, { navigate, score, difficulty }) {
+  const prevHigh = getHighScore(difficulty)
+  const isNewRecord = setHighScore(difficulty, score)
+  const highScore = Math.max(prevHigh, score)
+
   const screen = document.createElement('div')
   screen.className = 'screen result-screen'
 
@@ -7,7 +13,9 @@ export function renderResult(container, { navigate, score, difficulty }) {
     <div class="result-score">
       <div class="label">スコア</div>
       <div class="value">${score}</div>
-      <div class="high-score">🏆 ハイスコア: ${score}</div>
+      <div class="high-score${isNewRecord ? ' new-record' : ''}">
+        ${isNewRecord ? '🎉 ハイスコア更新！' : '🏆 ハイスコア:'} ${highScore}
+      </div>
     </div>
     <div class="result-actions">
       <button class="result-btn primary" id="retry-btn">もういちど</button>
